@@ -1,11 +1,11 @@
 import json
 import requests
 import sys
+from PyQt5.QtCore import QSize,Qt
 from http.cookiejar import CookieJar
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QTextEdit, QTableWidget, QTableWidgetItem, QHeaderView
-from PyQt5.QtGui import QPainter, QColor, QBrush
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QFileDialog, QTableWidget, QTableWidgetItem, QHeaderView
+from PyQt5.QtGui import QPainter, QColor, QBrush,QFont
 from bs4 import BeautifulSoup
-
 
 def load_cookies_from_file(file_path):
     with open(file_path, 'r') as f:
@@ -54,12 +54,26 @@ class NetflixCookieTester(QWidget):
         self.resize(600, 400)
         layout = QVBoxLayout()
 
+        self.result_layout = QHBoxLayout()
+        self.result_label = QLabel('')
+        self.result_layout.addWidget(self.result_label)
+        self.result_layout.addStretch(1)
+        self.result_circle = CircleWidget()
+        self.result_layout.addWidget(self.result_circle)
+        self.result_layout.addStretch(1)
+        layout.addLayout(self.result_layout)
+
         self.import_button = QPushButton('Import Cookies file', self)
         self.import_button.clicked.connect(self.import_cookies)
         layout.addWidget(self.import_button)
 
+
+
         self.result_label = QLabel('')
+        self.result_label.setAlignment(Qt.AlignCenter)
+        self.result_label.setFont(QFont("calibri", 16, QFont.Bold))
         layout.addWidget(self.result_label)
+
 
         self.account_button = QPushButton('Scrape Account Details', self)
         self.account_button.clicked.connect(self.scrape_account_details)
@@ -68,7 +82,7 @@ class NetflixCookieTester(QWidget):
 
         self.account_details_table = QTableWidget()
         self.account_details_table.setColumnCount(2)
-        self.account_details_table.setHorizontalHeaderLabels(['description', 'information'])
+        self.account_details_table.setHorizontalHeaderLabels(['Description', 'Information'])
         self.account_details_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.account_details_table.setEditTriggers(QTableWidget.NoEditTriggers)
         layout.addWidget(self.account_details_table)
@@ -88,16 +102,21 @@ class NetflixCookieTester(QWidget):
 
                 if self.valid:
                     self.result_label.setText("The Netflix cookies are valid.")
+                    self.valid = True
+                    self.result_circle.set_color(QColor(0, 255, 0))
                     self.account_button.setEnabled(True)
                 else:
                     self.result_label.setText("The Netflix cookies are not valid.")
+                    self.result_circle.set_color(QColor(255, 0, 0))
                     self.account_button.setEnabled(False)
 
                 self.update()  # Add this line to trigger a repaint of the widget
             except json.decoder.JSONDecodeError as e:
                 print(f"Error loading cookies from file {self.file_name}: {e}")
                 self.result_label.setText("Error loading cookies from file.")
+                self.result_circle.set_color(QColor(255, 0, 0))
                 self.account_button.setEnabled(False)
+                self.update()  # Add this line to trigger a repaint of the widget
 
     def scrape_account_details(self):
         url = "https://www.netflix.com/YourAccount"
@@ -144,8 +163,11 @@ class CircleWidget(QWidget):
         painter.drawEllipse(0, 0, self.width(), self.height())
 
     def sizeHint(self):
-        return self.minimumSizeHint()
+     return QSize(25, 25)
 
+    def resizeEvent(self, event):
+        size = min(self.width(), self.height())
+        self.setFixedSize(size, size)
 
 def main():
     app = QApplication(sys.argv)
