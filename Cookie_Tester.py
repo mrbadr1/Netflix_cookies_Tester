@@ -1,6 +1,6 @@
 import json,requests,sys,os
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtWidgets import QSizePolicy,QMessageBox,QApplication, QComboBox ,QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QFileDialog, QTableWidget, QTableWidgetItem, QHeaderView, QListWidget
+from PyQt5.QtWidgets import QSizePolicy,QInputDialog,QMessageBox,QApplication, QComboBox ,QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QFileDialog, QTableWidget, QTableWidgetItem, QHeaderView
 from PyQt5.QtGui import QPainter, QColor, QBrush, QFont
 from bs4 import BeautifulSoup
 from Functions import *
@@ -34,7 +34,7 @@ class NetflixCookieTester(QWidget):
         layout.addWidget(self.import_button)
         
         self.import_button = QPushButton('Paste Cookies string', self)
-        self.import_button.clicked.connect(self.import_cookies)
+        self.import_button.clicked.connect(self.import_string)
         layout.addWidget(self.import_button)
 
         self.cookies_listbox = QComboBox(self)
@@ -65,6 +65,16 @@ class NetflixCookieTester(QWidget):
         self.account_details_table.setEditTriggers(QTableWidget.NoEditTriggers)
         layout.addWidget(self.account_details_table)
         self.setLayout(layout)
+
+    def import_string(self):
+        # Show the input dialog
+        text, ok = QInputDialog.getText(self, 'Input Dialog', 'Enter your string:')
+
+        # If the user clicked OK, update the text box
+        if ok:
+            self.text_box.setText(text)
+
+
 
     def on_cookies_listbox_changed(self, index):
      file_name = self.cookies_listbox.currentText()
@@ -132,11 +142,11 @@ class NetflixCookieTester(QWidget):
 
                 if valid:
                     response = requests.get(url, headers=headers, cookies=cookie_jar)
-                    print(response.text)
                     account_details = {}
                     account_details['Email'] = scrap(response.text, '<div data-uia="account-email" class="account-section-item account-section-email">', '</div>').strip()
                     account_details['Subscription plan'] = scrap(response.text, '<div class="account-section-item" data-uia="plan-label"><b>', '</b>').strip()
                     account_details['Member since'] = scrap(response.text, 'class="account-section-membersince--svg"></div>','</div>').strip()
+
 
         except requests.exceptions.RequestException as e:
                 error_msg = f"Error connecting to {url}: {e}"
