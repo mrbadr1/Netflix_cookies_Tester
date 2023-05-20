@@ -17,7 +17,7 @@ class NetflixCookieTester(QWidget):
 
     def init_ui(self):
         self.setWindowTitle('Cookie Tester v 1.0')
-        self.resize(700, 400)
+        self.resize(600, 500)
         layout = QVBoxLayout()
 
         self.result_layout = QHBoxLayout()
@@ -53,6 +53,12 @@ class NetflixCookieTester(QWidget):
         self.result_label.setFont(QFont("calibri", 16, QFont.Bold))
         layout.addWidget(self.result_label)
 
+        self.account_button2 = QPushButton('convert NETSCAPE to JSON', self)
+        #self.account_button2.clicked.connect(self.convert_netscape_to_json)
+        self.account_button2.setVisible(False)
+        layout.addWidget(self.account_button2)
+
+
         self.account_button = QPushButton('Scrape Account Details', self)
         self.account_button.clicked.connect(self.scrape_account_details)
         self.account_button.setEnabled(False)
@@ -81,6 +87,7 @@ class NetflixCookieTester(QWidget):
      if file_name:
         self.result_circle.set_color(QColor(0, 0, 0))
         self.account_button.setEnabled(False)
+        self.account_button2.setVisible(False)
         self.check_cookies(file_name)
 
     def import_cookies(self):
@@ -96,8 +103,9 @@ class NetflixCookieTester(QWidget):
             self.cookies_listbox.addItem(item_name)
             self.result_label.setText(f"")
             self.result_circle.set_color(QColor(0, 0, 0))
+            self.account_button2.setVisible(False)
 
-
+              
     def check_cookies(self, item):
         try:
             file_name = self.file_dict[item]
@@ -107,21 +115,30 @@ class NetflixCookieTester(QWidget):
             valid = test_netflix_cookies(cookie_jar)
 
             if valid:
-                self.result_label.setText(f"cookies are valid format")
+                self.result_label.setText(f"cookies are working")
                 self.result_circle.set_color(QColor(0, 255, 0))
                 self.valid=True
                 self.account_button.setEnabled(True)
             else:
-                self.result_label.setText(f"cookies are invalid")
+                self.result_label.setText(f"cookies are not working")
                 self.account_button.setEnabled(False)
 
                 self.result_circle.set_color(QColor(255, 0, 0))
         except json.decoder.JSONDecodeError as e:
-            self.result_label.setText(f"Error loading cookies from file ")
+            if is_netscape_format(file_name):
+             self.result_label.setText(f"the file is in netscape format ")
+             self.account_button2.setVisible(True)
+
+            else:
+             self.result_label.setText(f"Error loading cookies from file ")
             self.account_button.setEnabled(False)
             self.result_circle.set_color(QColor(255, 0, 0))
             self.account_button.setEnabled(False)
 
+        except requests.exceptions.RequestException as e:
+                error_msg = f"Error connecting ..."
+                QMessageBox.critical(self, "Connection Error", error_msg)
+                return
 
 
     def scrape_account_details(self):
