@@ -4,8 +4,6 @@ from PyQt5.QtWidgets import QSizePolicy,QTextEdit,QDialog,QMessageBox,QApplicati
 from PyQt5.QtGui import QPainter, QColor, QBrush, QFont
 from bs4 import BeautifulSoup
 from Functions import *
-
-
 class CookieTester(QWidget):
     def __init__(self):
         super().__init__()
@@ -341,4 +339,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
