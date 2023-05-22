@@ -129,9 +129,10 @@ class CookieTester(QWidget):
 
 
     def set_default_background_color(self):
-        self.text_edit.setStyleSheet("")    
+                self.text_edit.setStyleSheet("")    
+                self.result_label3.setVisible(False)
+
     def test_cookies_string(self,string):
-     self.result_label3.setVisible(False)
 
      try:
       cookies_json = json.loads(string)
@@ -340,3 +341,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
