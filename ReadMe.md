@@ -40,7 +40,7 @@ If the cookie(s) are valid, the tool then sends a GET request to the account pag
 
 Contributing
 
-Contributions to the Netflix Cookie Tester are welcome! If you find a bug or have an idea for a new feature, please open an issue or submit a pull request.
+Contributions to the Cookie Tester are welcome! If you find a bug or have an idea for a new feature, please open an issue or submit a pull request.
 
 License
 
