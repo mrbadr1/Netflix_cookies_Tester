@@ -1,4 +1,7 @@
 Cookie Tester
+![Example screenshot](ScreenShots1.png)
+![Example screenshot](ScreenShots2.png)
+![Example screenshot](ScreenShots3.png)
 
 WARNING: Use at your own risk. This tool is for educational purposes only.
 The Cookie Tester is a Python-based tool that allows you to test  cookies to see if they are still valid and working. It also provides the ability to scrape account details from the account associated with the cookie.
