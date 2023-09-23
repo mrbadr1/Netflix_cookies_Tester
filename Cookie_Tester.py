@@ -3,21 +3,17 @@ from click import progressbar
 import subprocess
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect,QProgressBar,QAbstractItemView,QSizePolicy,QTextEdit,QDialog,QMessageBox,QProgressDialog,QRadioButton,QApplication, QComboBox ,QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QFileDialog, QTableWidget, QTableWidgetItem, QHeaderView
-from PyQt5.QtGui import QPainter, QColor, QBrush, QFont
 from bs4 import BeautifulSoup
 from Functions import *
-import glob
-import tkinter as tk
-from tkinter import filedialog
 import json,requests,os
 from http.cookiejar import CookieJar
-import pandas as pd
-import shutil
 from alive_progress import alive_bar
 import time
 import requests
 from bs4 import BeautifulSoup
 import re
+from PyQt5.QtGui import QFont, QPalette, QBrush, QColor, QLinearGradient
+from PyQt5.QtGui import QPainter
 import calendar
 folder_path=""
 working_cookies=0
@@ -49,18 +45,53 @@ class CookieTester(QWidget):
         self.result_label = QLabel('')
         self.result_layout.addWidget(self.result_label)
         self.result_layout.addStretch(1)
-
     
         self.import_button = QPushButton('IMPORT COOKIES', self)
         self.import_button.clicked.connect(self.import_cookies)
+        self.import_button.setStyleSheet('''
+            QPushButton {
+                background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1, stop: 0 #4CAF50, stop: 1 #45A049);
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1, stop: 0 #45A049, stop: 1 #4CAF50);
+            }
+        ''')
         layout.addWidget(self.import_button)
     
         self.test_button = QPushButton('CHECK ALL COOKIES', self)
         self.test_button.clicked.connect(self.test_all_cookies)
+        self.test_button.setStyleSheet('''
+            QPushButton {
+                background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1, stop: 0 #4CAF50, stop: 1 #45A049);
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1, stop: 0 #45A049, stop: 1 #4CAF50);
+            }
+        ''')
         layout.addWidget(self.test_button)
     
         self.import_button = QPushButton('COOKIES STRING', self)
         self.import_button.clicked.connect(self.COOKIE_WINDOW_TOPAST)
+        self.import_button.setStyleSheet('''
+            QPushButton {
+                background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1, stop: 0 #4CAF50, stop: 1 #45A049);
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 1, stop: 0 #45A049, stop: 1 #4CAF50);
+            }
+        ''')
         layout.addWidget(self.import_button)
     
         self.result_label2 = QLabel('')
@@ -76,18 +107,56 @@ class CookieTester(QWidget):
         self.cookies_listbox.lineEdit().setAlignment(Qt.AlignCenter)
         self.cookies_listbox.lineEdit().setReadOnly(True)
         self.cookies_listbox.lineEdit().setPlaceholderText("Select file...")
+        self.cookies_listbox.setStyleSheet('''
+        QComboBox {
+            background-color: white;
+            color: black;
+            border: 1px solid #CCCCCC;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        QComboBox::drop-down {
+            subcontrol-origin: padding;
+            subcontrol-position: top right;
+            width: 20px;
+            border-left-width: 1px;
+            border-left-color: #CCCCCC;
+            border-left-style: solid;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+        QComboBox::down-arrow {
+            image: url(down_arrow.png);
+        }
+    ''')
         layout.addWidget(self.cookies_listbox)
     
-        self.progress_bar = QProgressBar(self)
-        self.progress_bar.setRange(0, total_files)
-        self.progress_bar.setValue(0)
-        self.progress_bar.hide()
-
-        layout.addWidget(self.progress_bar)
-
+        self.current_label = QLabel('')
+        self.current_label.setAlignment(Qt.AlignCenter)
+        self.current_label.setFont(QFont("calibri", 11, QFont.Bold))
+        self.current_label.setVisible(False)
+        layout.addWidget(self.current_label)
+    
+        self.progress_bar_main = QProgressBar(self)
+        self.progress_bar_main.setStyleSheet('''
+        QProgressBar {
+            background-color: #E0E0E0;
+            color: Black;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        QProgressBar::chunk {
+            background-color: #4CAF50;
+            border-radius: 5px;
+        }
+    ''')
+        layout.addWidget(self.progress_bar_main)
+        self.progress_bar_main.hide()
+    
         self.result_label = QLabel('')
         self.result_label.setAlignment(Qt.AlignCenter)
-        self.result_label.setFont(QFont("calibri", 16, QFont.Bold))
+        self.result_label.setFont(QFont("calibri", 14, QFont.Bold))
         layout.addWidget(self.result_label)
     
         self.account_details_table = QTableWidget()
@@ -97,10 +166,32 @@ class CookieTester(QWidget):
         self.account_details_table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.account_details_table.cellClicked.connect(self.open_text_file)
         self.account_details_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.account_details_table.setStyleSheet('''
+        QTableWidget {
+            background-color: white;
+            color: black;
+            border: 1px solid #CCCCCC;
+            border-radius: 5px;
+        }
+        QTableWidget::item:selected {
+            background-color: #E0E0E0;
+        }
+    ''')
         layout.addWidget(self.account_details_table)
     
-        layout.setSpacing(10)  # Set spacing between widgets
+        layout.setSpacing(6)  # Set spacing between widgets
+    
+        # Set the background gradient
+        gradient = QLinearGradient(0, 0, 0, self.height())
+        gradient.setColorAt(0, QColor(240, 240, 240))
+        gradient.setColorAt(1, QColor(220, 220, 220))
+        palette = QPalette()
+        palette.setBrush(QPalette.Window, QBrush(gradient))
+        self.setPalette(palette)
         self.setLayout(layout)
+    
+
+
     def COOKIE_WINDOW_TOCOPY(self,PATH):
         # Create a QDialog to display the JSON data
         dialog = QDialog(self)
@@ -161,20 +252,26 @@ class CookieTester(QWidget):
        global total_files
        Dead_cookies = 0
        working_cookies = 0
+       self.test_button.setEnabled(False)
+       self.test_button.setText("CHECKING...")
        total_files = self.cookies_listbox.count()
-
-       # Clear the account details table
-       self.account_details_table.clearContents()
-       self.account_details_table.setRowCount(0)
-       self.progress_bar.show()
+       self.progress_bar_main.setRange(0, total_files)
+       self.progress_bar_main.setValue(0)
+       
+       self.progress_bar_main.show()
 
        for index in range(total_files):
+           self.current_label.setText(f'CHECKING..."{self.cookies_listbox.itemText(index)}"')
+           self.current_label.setVisible(True)
            self.check_cookies(index)
-           self.progress_bar.setValue(index + 1)
-       self.progress_bar.setValue(total_files)
-       self.progress_bar.hide()
-       self.result_label.setText(f'Working 🟢 : {working_cookies}  Dead 🔴 : {Dead_cookies}')
-
+           self.progress_bar_main.setValue(index + 1)
+       self.current_label.setText(f'Checking completed')
+       time.sleep(4)
+       self.current_label.setVisible(False)
+       self.progress_bar_main.hide()
+       self.result_label.setText(f'🟢Working: {working_cookies}  🔴Dead: {Dead_cookies}')
+       self.test_button.setEnabled(True)
+       self.test_button.setText("CHECK ALL COOKIES")
     def test_cookies(self):
             cookies_string = self.text_edit.toPlainText()
             if self.json_radio.isChecked():
@@ -378,7 +475,7 @@ class CookieTester(QWidget):
                 self.file_dict[item_name] = os.path.join(folder_path, file_name)
                 self.cookies_listbox.addItem(item_name)
             self.result_label.setText("")
-            self.result_label2.setText(f"{len(file_names)} text files imported")  # Set the text of result_label2 to show the number of imported text files
+            self.result_label2.setText(f"{len(file_names)} Text files")  # Set the text of result_label2 to show the number of imported text files
             self.result_label2.setVisible(True)
 
               
