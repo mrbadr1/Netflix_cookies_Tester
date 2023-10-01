@@ -1,1 +1,13 @@
-python-telegram-bot>=13.0
+json
+requests
+sys
+os
+threading
+time
+re
+calendar
+PyQt5
+click
+bs4
+http.cookiejar
+alive_progress
