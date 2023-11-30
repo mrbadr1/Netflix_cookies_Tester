@@ -6,7 +6,7 @@ def install_dependencies(package_list):
         except subprocess.CalledProcessError:
             print(f"An error occurred while installing {package}.")
 # List of necessary packages
-necessary_packages = ['json', 'requests', 'PyQt5', 'http.cookiejar', 'bs4','alive_progress']   
+necessary_packages = ['json', 'requests', 'sys', 'os', 'threading', 'time', 're', 'calendar', 'PyQt5', 'http.cookiejar', 'bs4', 'alive_progress']
 # Check if each necessary package is installed
 for package in necessary_packages:
     try:
