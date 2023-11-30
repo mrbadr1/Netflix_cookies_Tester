@@ -1,7 +1,7 @@
 Cookie Tester
 --------
 
-![Example screenshot](ScreenShots 1.png)
+![Example screenshot](ScreenShots1.png)
 
 ![Example screenshot](ScreenShots2.png)
 
