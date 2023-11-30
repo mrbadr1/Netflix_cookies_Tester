@@ -1,9 +1,9 @@
 Cookie Tester
 --------
 
-![Example screenshot](ScreenShots3.png)
+![Example screenshot](ScreenShots 1.png)
 
-
+![Example screenshot](ScreenShots2.png)
 
 WARNING: Use at your own risk. This tool is for educational purposes only.
 
